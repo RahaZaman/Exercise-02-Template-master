@@ -43,10 +43,6 @@ class Play extends Phaser.Scene {
         wallB.setX(Phaser.Math.Between(0 + wallB.width / 2, width - wallB.width/2))
         wallB.body.setImmovable(true)
 
-        // Add a collider to check for collisions with the screen edges
-        // this.physics.world.setBounds(0, 0, width, height); // Set the world bounds
-        // wallA.body.collideWorldBounds = true;
-
         this.walls = this.add.group([wallA, wallB])
 
         // one way

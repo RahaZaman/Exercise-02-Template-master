@@ -34,9 +34,18 @@ class Play extends Phaser.Scene {
         wallA.setX(Phaser.Math.Between(0 + wallA.width / 2, width - wallA.width/2))
         wallA.body.setImmovable(true)
 
+        wallA.setCollideWorldBounds(true, 1);
+
+        // making wall move left/right and bounce against the screen edges
+        wallA.body.setVelocityX(-100, 100); 
+
         let wallB = this.physics.add.sprite(0, height / 2, 'wall')
         wallB.setX(Phaser.Math.Between(0 + wallB.width / 2, width - wallB.width/2))
         wallB.body.setImmovable(true)
+
+        // Add a collider to check for collisions with the screen edges
+        // this.physics.world.setBounds(0, 0, width, height); // Set the world bounds
+        // wallA.body.collideWorldBounds = true;
 
         this.walls = this.add.group([wallA, wallB])
 
@@ -44,7 +53,7 @@ class Play extends Phaser.Scene {
         this.oneWay = this.physics.add.sprite(0, height / 4 * 3, 'oneway');
         this.oneWay.setX(Phaser.Math.Between(0 + this.oneWay.width / 2, width - this.oneWay.width / 2));
         this.oneWay.body.setImmovable(true);
-        this.oneWay.body.checkCollision.down = true;
+        this.oneWay.body.checkCollision.down = false;
 
         // 
         this.SHOT_VELOCITY_X = 200
@@ -54,12 +63,16 @@ class Play extends Phaser.Scene {
         this.input.on('pointerdown', (pointer) => {
             let shotDirection
             pointer.y <= this.ball.y ? shotDirection = 1 : shotDirection = -1
-            this.ball.body.setVelocityX(Phaser.Math.Between(-this.SHOT_VELOCITY_X, this.SHOT_VELOCITY_X))
+            pointer.x <= this.ball.x ? shotDirection = 1 : shotDirection = -1
+
+            // this.ball.body.setVelocityX(Phaser.Math.Between(-this.SHOT_VELOCITY_X, this.SHOT_VELOCITY_X))
+            this.ball.body.setVelocityX((-this.SHOT_VELOCITY_X, this.SHOT_VELOCITY_X) * shotDirection)
             this.ball.body.setVelocityY(Phaser.Math.Between(this.SHOT_VELOCITY_Y_MIN, this.SHOT_VELOCITY_Y_MAX) * shotDirection)
         })
 
         this.physics.add.collider(this.ball, this.cup, (ball, cup) => {
-            ball.destroy()
+            // ball resets to the bottom on a successful “hole-in”
+            ball.setPosition(width / 2, height - height / 10);
         })
         this.physics.add.collider(this.ball, this.walls)
         this.physics.add.collider(this.ball, this.oneWay)
